@@ -27,6 +27,11 @@ config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
 
 config :nerves, source_date_epoch: "1694868439"
 
+if Mix.target() == :rpi3a do
+  config :nerves, :firmware, fwup_conf: "config/fwup.conf"
+end
+
+
 if Mix.target() == :host do
   import_config "host.exs"
 else
