@@ -10,6 +10,13 @@ Application.start(:nerves_bootstrap)
 
 config :nerves_beacon, target: Mix.target()
 
+config :nerves_beacon, :bluetooth,
+  uuid: "92e0244f-9ec5-4472-bde6-f497586be470",
+  major: 1,
+  minor: 2,
+  tx_power: -49,  # This should be an integer. The example uses -59dBm.
+  advertising_period: 120_000
+
 # Customize non-Elixir parts of the firmware. See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.
 
