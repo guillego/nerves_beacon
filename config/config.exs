@@ -14,7 +14,7 @@ config :nerves_beacon, :bluetooth,
   uuid: "92e0244f-9ec5-4472-bde6-f497586be470",
   major: 1,
   minor: 2,
-  tx_power: -49,  # This should be an integer. The example uses -59dBm.
+  tx_power: -59,  # This should be an integer (dBm)
   advertising_period: 120_000
 
 # Customize non-Elixir parts of the firmware. See
