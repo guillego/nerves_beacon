@@ -2,7 +2,6 @@ defmodule NervesBeacon.Bluetooth.Transmitter do
   use GenServer
 
   alias BlueHeron.Peripheral
-  alias BlueHeron.DataType.ManufacturerData.Apple
   alias BlueHeron.HCI.Command.ControllerAndBaseband.WriteLocalName
 
   alias NervesBeacon.Bluetooth.IBeacon
