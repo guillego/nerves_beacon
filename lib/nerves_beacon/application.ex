@@ -16,7 +16,7 @@ defmodule NervesBeacon.Application do
         # Children for all targets
         # Starts a worker by calling: NervesBeacon.Worker.start_link(arg)
         # {NervesBeacon.Worker, arg},
-        {NervesBeacon.Bluetooth.Beacon, []}
+        {NervesBeacon.Bluetooth.Transmitter, []}
       ] ++ children(target())
 
     Supervisor.start_link(children, opts)

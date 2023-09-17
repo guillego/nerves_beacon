@@ -1,9 +1,11 @@
-defmodule NervesBeacon.Bluetooth.Beacon do
+defmodule NervesBeacon.Bluetooth.Transmitter do
   use GenServer
 
   alias BlueHeron.Peripheral
   alias BlueHeron.DataType.ManufacturerData.Apple
   alias BlueHeron.HCI.Command.ControllerAndBaseband.WriteLocalName
+
+  alias NervesBeacon.Bluetooth.IBeacon
 
   require Logger
 
@@ -36,15 +38,6 @@ defmodule NervesBeacon.Bluetooth.Beacon do
     advertising_filter_policy: 0x00
   }
 
-  @ibeacon_preamble %{
-    flag_length: 0x02,
-    flag_type: 0x01,
-    flag_value: 0x06,
-    manufacturer_data_length: 0x1A,
-    manufacturer_data_type: 0xFF,
-    manufacturer_data_company_id: [0x4C, 0x00]
-  }
-
   def start_link(_config) do
     {:ok, config} = Application.fetch_env(:nerves_beacon, :bluetooth)
     Logger.info(inspect(config))
@@ -64,7 +57,7 @@ defmodule NervesBeacon.Bluetooth.Beacon do
 
     Logger.info("Setting up iBeacon advertising")
 
-    payload = get_beacon_payload(config)
+    payload = IBeacon.get_payload(config[:uuid], config[:major], config[:minor], config[:tx_power])
     Logger.info(inspect(payload))
 
     # Set advertising parameters
@@ -82,6 +75,7 @@ defmodule NervesBeacon.Bluetooth.Beacon do
   @impl GenServer
   def handle_info(:start_advertising, state) do
     Logger.info("Starting advertising")
+    Logger.info("Beacon configuration: " <> inspect(state.config))
     Peripheral.start_advertising(state.peripheral_pid)
 
     # Advertise for the designated period
@@ -100,35 +94,4 @@ defmodule NervesBeacon.Bluetooth.Beacon do
     {:noreply, state}
   end
 
-  defp get_beacon_payload([uuid: uuid, major: major, minor: minor, tx_power: tx_power] = config) do
-    uuid_integer =
-      uuid
-      |> UUID.string_to_binary!()
-      |> :binary.decode_unsigned()
-
-    {:ok, beacon_data} =
-      Apple.serialize(
-        {"iBeacon",
-         %{
-           major: major,
-           minor: minor,
-           tx_power: tx_power,
-           uuid: uuid_integer
-         }}
-      )
-
-    gen_ibeacon_preamble() <> beacon_data
-  end
-
-  defp gen_ibeacon_preamble do
-    <<
-      @ibeacon_preamble.flag_length,
-      @ibeacon_preamble.flag_type,
-      @ibeacon_preamble.flag_value,
-      @ibeacon_preamble.manufacturer_data_length,
-      @ibeacon_preamble.manufacturer_data_type,
-      @ibeacon_preamble.manufacturer_data_company_id[0],
-      @ibeacon_preamble.manufacturer_data_company_id[1]
-    >>
-  end
 end
